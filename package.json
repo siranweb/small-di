@@ -1,6 +1,6 @@
 {
   "name": "small-di",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "⭐ REALLY small package for DI injection",
   "main": "dist/index.js",
   "module": "dist",
@@ -19,7 +19,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/siranweb/small-di"
+    "url": "git+https://github.com/siranweb/small-di.git"
   },
   "bugs": {
     "url": "https://github.com/siranweb/small-di/issues"

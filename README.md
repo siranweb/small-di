@@ -1,4 +1,6 @@
 # Small DI
+![NPM Version](https://img.shields.io/npm/v/small-di)
+
 Lightweight, zero dependencies, type-safe, without decorators and `reflect-metadata`.
 
 ## Installation
