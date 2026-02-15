@@ -1,0 +1,40 @@
+{
+  "name": "small-di",
+  "version": "0.0.1",
+  "description": "A small dependency injection library",
+  "main": "dist/index.js",
+  "module": "dist",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "keywords": [
+    "dependency-injection",
+    "di",
+    "ioc",
+    "container"
+  ],
+  "author": "siranweb <siranweb.public@tuta.io>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/siranweb/small-di"
+  },
+  "bugs": {
+    "url": "https://github.com/siranweb/small-di/issues"
+  },
+  "homepage": "https://github.com/siranweb/small-di",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "devDependencies": {
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.10.6",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.3.3"
+  }
+}
