@@ -1,6 +1,6 @@
 import { createContainer } from '.';
 
-describe('DI Container', () => {
+describe('small-di', () => {
   it('should resolve basic dependency', () => {
     const container = createContainer<{
       dep1: { method: (msg: string) => void };
@@ -227,6 +227,14 @@ describe('DI Container', () => {
 
     expect(() => container.resolve('dep1')).toThrow(
         'Circular dependency detected: dep1 -> dep2 -> dep3 -> dep1'
+    );
+  });
+
+  it('should throw error on resolving missing dependency', () => {
+    const container = createContainer<{}>({});
+    // @ts-expect-error test purposes
+    expect(() => container.resolve('dep1')).toThrow(
+        `Dependency "dep1" not found`
     );
   });
 

@@ -10,10 +10,14 @@ export function createContainer<DepsList extends Record<string, any>>(
       }
   });
 
-  const resolve = <Name extends keyof DepsList>(name: Name): DepsList[Name] => {
+  const resolve = <Name extends keyof DepsList>(name: Name & string): DepsList[Name] => {
       if (resolving.has(name)) {
           const cyclePath = Array.from(resolving).concat(name).join(' -> ');
           throw new Error(`Circular dependency detected: ${cyclePath}`);
+      }
+
+      if (!spec[name]) {
+          throw new Error(`Dependency "${name}" not found`);
       }
 
       try {

@@ -1,7 +1,7 @@
 {
   "name": "small-di",
   "version": "0.0.1",
-  "description": "A small dependency injection library",
+  "description": "⭐ REALLY small package for DI injection",
   "main": "dist/index.js",
   "module": "dist",
   "types": "dist/index.d.ts",
