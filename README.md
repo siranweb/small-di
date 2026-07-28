@@ -1,7 +1,7 @@
 # Small DI
 ![NPM Version](https://img.shields.io/npm/v/small-di)
 
-Lightweight, zero dependencies, type-safe, without decorators and `reflect-metadata`.
+Lightweight, zero dependencies, type-safe, type hints, without decorators and `reflect-metadata`.
 
 ## Installation
 
@@ -11,57 +11,24 @@ npm i small-di
 ```
 
 ## Usage
-First, specify your classes, variables, etc.:
-```ts
-interface IApi {
-    fetchData(): void;
-}
-interface IUserService {
-    getUser(): void;
-}
 
-class Api implements IApi {
-    public fetchData() {
-        console.log('fetchData')
-    }
-}
-
-class UserService implements IUserService {
-    constructor(private readonly api: IApi) {}
-
-    public getUser() {
-        console.log('getUser')
-    }
-}
-
-const config = {
-    SECRET: 'secret',
-} as const
-```
-
-Now, provide them to container. You must specify how your deps should be created and injected:
+Provide some deps to container. You must specify how your deps should be created and injected:
 ```ts
 const di = createContainer<{ // provide some types
     api: IApi,
     userService: IUserService,
-    config: typeof config, // manually created types are optional, but recommended
 }>({
     api: {
         factory(): IApi {
             return new Api();
         },
-        mode: 'singleton', // if not specified, "default" is used
+        mode: 'singleton', // if not specified, container's mode is used ("default"). See below for more info.
     },
     userService: {
-        factory({ api }): IUserService { // factory gets "deps" object
-            return new UserService(api);
+        factory(deps): IUserService {
+            return new UserService(deps.api);
         },
     },
-    config: {
-        factory() {
-            return config;
-        }
-    }
 })
 ```
 Get what you need:
@@ -71,9 +38,6 @@ api.fetchData();
 
 const userService = di.resolve('userService');
 userService.getUser();
-
-const config = di.resolve('config');
-console.log(config.SECRET);
 ```
 
 ...and that's all.
@@ -95,10 +59,15 @@ di.resolve('dep1') // Error: Circular dependency detected: dep1 -> dep2 -> dep3 
 ```
 
 ## API
-### `createContainer(spec)`
-Creates new container. `spec` provides information, how deps should be handled:
+### `createContainer(options?, spec)`
+Creates new container.
+
+Optional `options` argument can be passed:
+- `options.mode?` - `default` or `singleton`. Container selected mode. Can be used to reduce boilerplate.
+
+`spec` provides information, how deps should be handled:
 - `spec.factory(deps)` - creation method for dependency
-- `spec.mode?` - `default` or `singleton`. If `default` will be created every time when requested. If `singleton` - will be created only once, and then reused.
+- `spec.mode?` - `default` or `singleton`. Overrides container's selected mode. If `default` will be created every time when requested. If `singleton` - will be created only once, and then reused.
 
 Requested means using `.resolve` or by getter `deps.depName` in `factory` (handled with `Proxy`).
 

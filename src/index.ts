@@ -1,8 +1,17 @@
+const DEFAULT_OPTIONS: Required<Options> = Object.freeze({
+  mode: 'default',
+});
+
+export function createContainer<DepsList extends Record<string, any>>(spec: DepsSpec<DepsList>): Container<DepsList>;
+export function createContainer<DepsList extends Record<string, any>>(options: Options, spec: DepsSpec<DepsList>): Container<DepsList>;
 export function createContainer<DepsList extends Record<string, any>>(
-  spec: DepsSpec<DepsList>
-) {
+  optionsOrSpec: Options | DepsSpec<DepsList>,
+  spec?: DepsSpec<DepsList>,
+): Container<DepsList> {
   const singletons: Partial<DepsList> = {};
   const resolving = new Set<keyof DepsList>();
+  const options = { ...DEFAULT_OPTIONS, ...(spec ? optionsOrSpec : {})} as Required<Options>;
+  const passedSpec = spec ?? optionsOrSpec as DepsSpec<DepsList>;
 
   const deps = new Proxy({} as DepsList, {
       get(_target, p: keyof DepsList & string): any {
@@ -16,19 +25,20 @@ export function createContainer<DepsList extends Record<string, any>>(
           throw new Error(`Circular dependency detected: ${cyclePath}`);
       }
 
-      if (!spec[name]) {
+      if (!passedSpec[name]) {
           throw new Error(`Dependency "${name}" not found`);
       }
 
       try {
           resolving.add(name);
-          if (spec[name].mode === 'singleton') {
+          const mode = passedSpec[name].mode ?? options.mode;
+          if (mode === 'singleton') {
               if (!singletons[name]) {
-                  singletons[name] = spec[name].factory(deps);
+                  singletons[name] = passedSpec[name].factory(deps);
               }
               return singletons[name]!;
           }
-          return spec[name].factory(deps);
+          return passedSpec[name].factory(deps);
       } finally {
           resolving.delete(name);
       }
@@ -39,9 +49,20 @@ export function createContainer<DepsList extends Record<string, any>>(
   };
 }
 
+type Options = {
+    /** Mode for dependencies. If not provided, `default` is used. */
+    mode?: Mode;
+}
+
+type Mode = 'default' | 'singleton';
+
 type DepsSpec<DepsList extends Record<string, any>> = {
     [K in keyof DepsList]: {
         factory: (deps: DepsList) => DepsList[K];
-        mode?: 'default' | 'singleton';
+        mode?: Mode;
     };
 };
+
+type Container<DepsList extends Record<string, any>> = {
+    resolve: <Name extends keyof DepsList>(name: Name & string) => DepsList[Name];
+}
